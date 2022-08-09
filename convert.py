@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 
 layout = [
     [sg.Text('Numeric Converter')],
-    [sg.Input(key = '-INPUT_FIELD-'), sg.Spin(['binary to decimal','decimal to binary'],key = '-CONVERSION_SELECTOR-')],
+    [sg.Input(key = '-INPUT_FIELD-'), sg.Spin(['binary to decimal','decimal to binary','decimal to octal', 'octal to decimal'],key = '-CONVERSION_SELECTOR-')],
     [sg.Button('Convert', key="-CONVERT_BUTTON-"), sg.Text(' [ Value Field ]', key='-VALUE_FIELD-')]
 ]
 
@@ -60,6 +60,57 @@ def decToBin(val):
     
     return converted_value
 
+def decToOct(val):
+    converted_value = ''
+    error_message = '[ something doesn\'t seem right with your input ]'
+
+    # return error message if inputed value is empty
+    if val == '':
+        return error_message
+    
+    # if input value is only numbers, we can continue with code
+    if val.isnumeric():
+        val = int(val)
+        while val != 0:
+            digit = val % 8
+            converted_value = str(digit) + converted_value
+            val = val // 8
+    else:
+        return error_message
+    
+    return converted_value
+
+def octToDec(val):
+    converted_value = 0
+    error_message = '[ something doesn\'t seem right with your input ]'
+    # increment power 
+    counter = 0
+    # splits string input into a list by character
+    checker = [val for val in val]
+    condition = True
+    # if input is blank return error
+    if val == '' or val.isnumeric() is not True:
+        return error_message
+    # checks if each element in checker between 0 and 8
+    for x in checker:
+        if int(x) not in range(8):
+            condition = False
+
+    # if input is in range(8) we convert from binary to decimal   
+    if condition == True:
+        val = int(val)
+        while val != 0:
+            digit = val % 10
+            converted_value = converted_value + (digit * pow(8,counter))
+            counter += 1
+            val = val//10
+    
+    # if there is something wrong with input, we throw an error message
+    else:
+        converted_value = error_message
+
+    # returns converted value or error message
+    return converted_value
 
 while True:
     event, values = window.read()
@@ -75,6 +126,10 @@ while True:
             converted_value = binToDec(val)
         elif values['-CONVERSION_SELECTOR-'] == 'decimal to binary':
             converted_value = decToBin(val)
+        elif values['-CONVERSION_SELECTOR-'] == 'octal to decimal':
+            converted_value = octToDec(val)    
+        elif values['-CONVERSION_SELECTOR-'] == 'decimal to octal':
+            converted_value = decToOct(val)
 
         window['-VALUE_FIELD-'].update(converted_value)
 
